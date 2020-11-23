@@ -15,34 +15,34 @@ public class InstructorClient {
     public InstructorClient() {
     }
 
-    public static void main(String[] var0) throws IOException {
+    public static void main(String[] args) throws IOException {
         toserver = new Socket("localhost", 7788);
         instream = new DataInputStream(toserver.getInputStream());
         outstream = new DataOutputStream(toserver.getOutputStream());
-        PrintWriter var1 = new PrintWriter(outstream, true);
-        BufferedReader var2 = new BufferedReader(new InputStreamReader(instream));
+        PrintWriter out = new PrintWriter(outstream, true);
+        BufferedReader in = new BufferedReader(new InputStreamReader(instream));
         board = new char[3][3];
 
-        for(int var3 = 0; var3 <= 2; ++var3) {
-            for(int var4 = 0; var4 <= 2; ++var4) {
-                board[var3][var4] = ' ';
+        for(int rowSpaceToFill = 0; rowSpaceToFill <= 2; ++rowSpaceToFill) {
+            for(int columnSpaceToFill = 0; columnSpaceToFill <= 2; ++columnSpaceToFill) {
+                board[rowSpaceToFill][columnSpaceToFill] = ' ';
             }
         }
 
         row = -1;
         col = -1;
-        playgame(var2, var1);
+        playgame(in, out);
     }
 
-    public static void playgame(BufferedReader var0, PrintWriter var1) throws IOException {
-        Scanner var2 = new Scanner(System.in);
-        boolean var4 = false;
+    public static void playgame(BufferedReader in, PrintWriter out) throws IOException {
+        Scanner scannerInput = new Scanner(System.in);
+        boolean gameOver = false;
 
-        for(boolean var5 = false; !var5; var4 = !var4) {
-            if (!var4) {
-                String var3 = var0.readLine();
-                if (!var3.equals("NONE")) {
-                    String[] var6 = var3.split("\\s+");
+        for(boolean var5 = false; !var5; gameOver = !gameOver) {
+            if (!gameOver) {
+                String str = in.readLine();
+                if (!str.equals("NONE")) {
+                    String[] var6 = str.split("\\s+");
                     if (var6.length > 3) {
                         row = Integer.parseInt(var6[1]);
                         col = Integer.parseInt(var6[2]);
@@ -93,14 +93,14 @@ public class InstructorClient {
                 while(true) {
                     do {
                         System.out.print("\nEnter Row : ");
-                        row = var2.nextInt();
+                        row = scannerInput.nextInt();
                         System.out.print("Enter Column : ");
-                        col = var2.nextInt();
+                        col = scannerInput.nextInt();
                     } while(row < 0);
 
                     if (row <= 2 && col <= 2 && col >= 0 && board[row][col] == ' ') {
                         board[row][col] = 'O';
-                        var1.println("MOVE " + row + " " + col);
+                        out.println("MOVE " + row + " " + col);
                         break;
                     }
                 }

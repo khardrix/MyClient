@@ -57,14 +57,48 @@ public class MyClient {
         }
 
         boolean continueGame = true;
-        boolean validInput = false;
+        boolean validRow = false;
+        boolean validColumn = false;
+        boolean validSquare = false;
 
         while(continueGame) {
-            if(turn) {
-                System.out.println("Enter the row ");
-                String userInput = input.nextLine();
+            if (turn) {
+                while(validSquare) {
+                    while (!validRow) {
+                        System.out.println("Enter the row of the place you want to put a mark: ");
+                        String userInput = input.nextLine();
+                        while (!userInput.matches("[012]")) {
+                            System.out.print("Invalid Input(numbers 0 - 2). Enter " +
+                                    "a row number between 0 - 2 (only): ");
+                            userInput = input.nextLine();
+                        }
+                        row = Integer.parseInt(userInput);
+
+                        System.out.println("Enter the column of the place you want to put a mark: ");
+                        userInput = input.nextLine();
+                        while (!validColumn) {
+                            System.out.print("Invalid Input(numbers 0 - 2). Enter " +
+                                    "a column number between 0 - 2 (only): ");
+                            userInput = input.nextLine();
+                        }
+                        col = Integer.parseInt(userInput);
+                    }
+                    if(board[row][col] == ' ') {
+                        validSquare = true;
+                    }
+                }
+                // board[row][col] = 'O';
+
+                // out.println("MOVE " + row + " " + col);
+
+                // printBoard();
             }
         }
+    }
+
+
+    public static void printBoard() {
+        int x = 8;
     }
 }
 
