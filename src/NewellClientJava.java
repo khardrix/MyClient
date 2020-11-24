@@ -1,8 +1,18 @@
-import java.io.*;
+//
+// Source code recreated from a .class file by IntelliJ IDEA
+// (powered by Fernflower decompiler)
+//
+
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
 
-public class InstructorClient {
+public class NewellClientJava {
     private static Socket toserver;
     private static char[][] board;
     private static int row;
@@ -12,64 +22,64 @@ public class InstructorClient {
     private static PrintWriter out;
     private static BufferedReader in;
 
-    public InstructorClient() {
+    public NewellClientJava() {
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] var0) throws IOException {
         toserver = new Socket("localhost", 7788);
         instream = new DataInputStream(toserver.getInputStream());
         outstream = new DataOutputStream(toserver.getOutputStream());
-        PrintWriter out = new PrintWriter(outstream, true);
-        BufferedReader in = new BufferedReader(new InputStreamReader(instream));
+        PrintWriter var1 = new PrintWriter(outstream, true);
+        BufferedReader var2 = new BufferedReader(new InputStreamReader(instream));
         board = new char[3][3];
 
-        for(int rowSpaceToFill = 0; rowSpaceToFill <= 2; ++rowSpaceToFill) {
-            for(int columnSpaceToFill = 0; columnSpaceToFill <= 2; ++columnSpaceToFill) {
-                board[rowSpaceToFill][columnSpaceToFill] = ' ';
+        for(int var3 = 0; var3 <= 2; ++var3) {
+            for(int var4 = 0; var4 <= 2; ++var4) {
+                board[var3][var4] = ' ';
             }
         }
 
         row = -1;
         col = -1;
-        playgame(in, out);
+        playgame(var2, var1);
     }
 
-    public static void playgame(BufferedReader in, PrintWriter out) throws IOException {
-        Scanner scannerInput = new Scanner(System.in);
-        boolean gameOver = false;
+    public static void playgame(BufferedReader var0, PrintWriter var1) throws IOException {
+        Scanner var2 = new Scanner(System.in);
+        boolean var4 = false;
 
-        for(boolean computerTurn = false; !computerTurn; gameOver = !gameOver) {
-            if (!gameOver) {
-                String str = in.readLine();
-                if (!str.equals("NONE")) {
-                    String[] data = str.split("\\s+");
-                    if (data.length > 3) {
-                        row = Integer.parseInt(data[1]);
-                        col = Integer.parseInt(data[2]);
-                        if (!data[3].equals("WIN") && row != -1) {
+        for(boolean var5 = false; !var5; var4 = !var4) {
+            if (!var4) {
+                String var3 = var0.readLine();
+                if (!var3.equals("NONE")) {
+                    String[] var6 = var3.split("\\s+");
+                    if (var6.length > 3) {
+                        row = Integer.parseInt(var6[1]);
+                        col = Integer.parseInt(var6[2]);
+                        if (!var6[3].equals("WIN") && row != -1) {
                             board[row][col] = 'X';
                         }
 
-                        String result = data[3];
-                        byte resultMessageOption = -1;
-                        switch(result.hashCode()) {
+                        String var7 = var6[3];
+                        byte var8 = -1;
+                        switch(var7.hashCode()) {
                             case 83056:
-                                if (result.equals("TIE")) {
-                                    resultMessageOption = 1;
+                                if (var7.equals("TIE")) {
+                                    var8 = 1;
                                 }
                                 break;
                             case 85948:
-                                if (result.equals("WIN")) {
-                                    resultMessageOption = 0;
+                                if (var7.equals("WIN")) {
+                                    var8 = 0;
                                 }
                                 break;
                             case 2342691:
-                                if (result.equals("LOSS")) {
-                                    resultMessageOption = 2;
+                                if (var7.equals("LOSS")) {
+                                    var8 = 2;
                                 }
                         }
 
-                        switch(resultMessageOption) {
+                        switch(var8) {
                             case 0:
                                 System.out.println("\n\nCongratulations!!! You WON the game!");
                                 break;
@@ -80,10 +90,10 @@ public class InstructorClient {
                                 System.out.println("\nSORRY! You LOST the game!");
                         }
 
-                        computerTurn = true;
+                        var5 = true;
                     } else {
-                        row = Integer.parseInt(data[1]);
-                        col = Integer.parseInt(data[2]);
+                        row = Integer.parseInt(var6[1]);
+                        col = Integer.parseInt(var6[2]);
                         board[row][col] = 'X';
                     }
                 } else {
@@ -93,14 +103,14 @@ public class InstructorClient {
                 while(true) {
                     do {
                         System.out.print("\nEnter Row : ");
-                        row = scannerInput.nextInt();
+                        row = var2.nextInt();
                         System.out.print("Enter Column : ");
-                        col = scannerInput.nextInt();
+                        col = var2.nextInt();
                     } while(row < 0);
 
                     if (row <= 2 && col <= 2 && col >= 0 && board[row][col] == ' ') {
                         board[row][col] = 'O';
-                        out.println("MOVE " + row + " " + col);
+                        var1.println("MOVE " + row + " " + col);
                         break;
                     }
                 }
@@ -116,9 +126,9 @@ public class InstructorClient {
     public static void printboard() {
         System.out.println("\n\nCLIENT PRINT");
 
-        for(int r = 0; r <= 2; ++r) {
-            System.out.println(board[r][0] + " | " + board[r][1] + " | " + board[r][2]);
-            if (r != 2) {
+        for(int var0 = 0; var0 <= 2; ++var0) {
+            System.out.println(board[var0][0] + " | " + board[var0][1] + " | " + board[var0][2]);
+            if (var0 != 2) {
                 System.out.println("----------");
             }
         }
