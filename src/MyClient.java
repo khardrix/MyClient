@@ -1,104 +1,111 @@
+/*********************************************************************************************************************
+ *********************************************************************************************************************
+ *****                                       Program #2: Tic-Tac-Toe                                             *****
+ *****___________________________________________________________________________________________________________*****
+ *****                                     Developed by: Ryan Huffman                                            *****
+ *****                                             CSC-460-001                                                   *****
+ *****                                         Professor Gary Newell                                             *****
+ *********************************************************************************************************************
+ ********************************************************************************************************************/
+
 import java.io.*;
-import java.net.*;
+import java.net.Socket;
 import java.util.Scanner;
 
 public class MyClient {
+    private static char[][] board;
 
-    private static Scanner input = new Scanner(System.in);
-    private static DataInputStream instream;
-    private static DataOutputStream outstream;
-    private static PrintWriter out;
-    private static BufferedReader in;
-    private static int row = -1, col = -1, serverRow = -1, serverCol = -1;
-    private static boolean turn = false;
-    private static char [][] board;
+    public static void main(String[] args) throws IOException {
+        Socket toserver = new Socket("localhost", 7788);
+        DataInputStream instream = new DataInputStream(toserver.getInputStream());
+        DataOutputStream outstream = new DataOutputStream(toserver.getOutputStream());
+        BufferedReader in = new BufferedReader(new InputStreamReader(instream));
+        PrintWriter out = new PrintWriter(outstream, true);
 
-
-    public static void main(String[] args) {
-
-        Socket toserversocket;  // This is the phone for communication with server
-        int reply;       // ignore - for use in a later example
-
-        System.out.println("CLIENT is attempting connection....");
-        try {
-            // connect to the address (in this case “localhost”) at door # 7788
-            toserversocket = new Socket("localhost", 7788);
-            System.out.println("CLIENT CONNECTION HAS BEEN MADE");
-
-            instream = new DataInputStream(toserversocket.getInputStream());
-            outstream = new DataOutputStream(toserversocket.getOutputStream());
-            out = new PrintWriter(outstream, true);
-            in = new BufferedReader(new InputStreamReader(instream));
-
-            row = -1;
-            col = -1;
-
-            board = new char[3][3];
-
-
-            for(int i = 0; i < 3; i++) {
-                for(int j = 0; j < board[i].length; j++) {
-                    board[i][j] = ' ';
-                }
-            }
-        }
-        catch (IOException  e) {
-            System.out.println(e);
-        }
+        board = new char[3][3];
+        initBoard();
+        playgame(in, out);
     }
 
-
-    public static void playGame(BufferedReader intake, PrintWriter output) throws IOException {
-        if(in.readLine().equals("NONE")){
-            turn = true;     // player's turn
-        }
-        else {
-            turn = false;    // computer's turn
-        }
-
-        boolean continueGame = true;
-        boolean validRow = false;
-        boolean validColumn = false;
-        boolean validSquare = false;
-
-        while(continueGame) {
-            if (turn) {
-                while(validSquare) {
-                    while (!validRow) {
-                        System.out.println("Enter the row of the place you want to put a mark: ");
-                        String userInput = input.nextLine();
-                        while (!userInput.matches("[012]")) {
-                            System.out.print("Invalid Input(numbers 0 - 2). Enter " +
-                                    "a row number between 0 - 2 (only): ");
-                            userInput = input.nextLine();
-                        }
-                        row = Integer.parseInt(userInput);
-
-                        System.out.println("Enter the column of the place you want to put a mark: ");
-                        userInput = input.nextLine();
-                        while (!validColumn) {
-                            System.out.print("Invalid Input(numbers 0 - 2). Enter " +
-                                    "a column number between 0 - 2 (only): ");
-                            userInput = input.nextLine();
-                        }
-                        col = Integer.parseInt(userInput);
-                    }
-                    if(board[row][col] == ' ') {
-                        validSquare = true;
-                    }
-                }
-                // board[row][col] = 'O';
-
-                // out.println("MOVE " + row + " " + col);
-
-                // printBoard();
+    public static void initBoard() {
+        for(int r = 0; r <= 2; ++r) {
+            for(int c = 0; c <= 2; ++c) {
+                board[r][c] = ' ';
             }
         }
     }
 
+    public static void playgame(BufferedReader in, PrintWriter out) throws IOException {
+        Scanner scannerInput = new Scanner(System.in);
+        boolean playerTurn = false;
+        int row = -1;
+        int col = -1;
 
-    public static void printBoard() {
-        int x = 8;
+        for(boolean gameOver = false; !gameOver; playerTurn = !playerTurn) {
+            if (!playerTurn) {
+                String line = in.readLine();
+                if (!line.equals("NONE")) {
+                    String[] data = line.split("\\s+");
+                    row = Integer.parseInt(data[1]);
+                    col = Integer.parseInt(data[2]);
+
+                    if (data.length > 3) {
+                        if (!data[3].equals("WIN") && row != -1) {
+                            board[row][col] = 'X';
+                        }
+
+                        String result = data[3];
+                        switch(result) {
+                            case "WIN":
+                                System.out.println("\n\nCongratulations!!! You WON the game!");
+                                break;
+                            case "LOSS":
+                                System.out.println("\nSORRY! You LOST the game!");
+                                break;
+                            case "TIE":
+                                System.out.println("\nThe game was a TIE!");
+                                break;
+                        }
+
+                        gameOver = true;
+                    } else {
+                        board[row][col] = 'X';
+                    }
+                } else {
+                    System.out.println("\nYOU MOVE FIRST");
+                }
+            } else {
+                while(true) {
+                    do {
+                        System.out.print("\nEnter Row : ");
+                        row = scannerInput.nextInt();
+                        System.out.print("Enter Column : ");
+                        col = scannerInput.nextInt();
+                    } while(row < 0);
+
+                    if (row <= 2 && col <= 2 && col >= 0 && board[row][col] == ' ') {
+                        board[row][col] = 'O';
+                        out.println("MOVE " + row + " " + col);
+                        break;
+                    }
+                }
+            }
+
+            printboard();
+        }
+
+        System.out.println("\n\nHere is the final game board");
+        printboard();
+    }
+
+    public static void printboard() {
+        System.out.println("\n\nCLIENT PRINT");
+
+        for(int r = 0; r <= 2; ++r) {
+            System.out.println(board[r][0] + " | " + board[r][1] + " | " + board[r][2]);
+            if (r != 2) {
+                System.out.println("----------");
+            }
+        }
     }
 }
-
