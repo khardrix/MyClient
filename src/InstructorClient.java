@@ -3,43 +3,36 @@ import java.net.Socket;
 import java.util.Scanner;
 
 public class InstructorClient {
-    private static Socket toserver;
     private static char[][] board;
-    private static int row;
-    private static int col;
-    private static DataInputStream instream;
-    private static DataOutputStream outstream;
-    private static PrintWriter out;
-    private static BufferedReader in;
-
-    public InstructorClient() {
-    }
 
     public static void main(String[] args) throws IOException {
-        toserver = new Socket("localhost", 7788);
-        instream = new DataInputStream(toserver.getInputStream());
-        outstream = new DataOutputStream(toserver.getOutputStream());
-        PrintWriter out = new PrintWriter(outstream, true);
+        Socket toserver = new Socket("localhost", 7788);
+        DataInputStream instream = new DataInputStream(toserver.getInputStream());
+        DataOutputStream outstream = new DataOutputStream(toserver.getOutputStream());
         BufferedReader in = new BufferedReader(new InputStreamReader(instream));
-        board = new char[3][3];
+        PrintWriter out = new PrintWriter(outstream, true);
 
-        for(int rowSpaceToFill = 0; rowSpaceToFill <= 2; ++rowSpaceToFill) {
-            for(int columnSpaceToFill = 0; columnSpaceToFill <= 2; ++columnSpaceToFill) {
-                board[rowSpaceToFill][columnSpaceToFill] = ' ';
+        board = new char[3][3];
+        initBoard();
+        playgame(in, out);
+    }
+
+    public static void initBoard() {
+        for(int r = 0; r <= 2; ++r) {
+            for(int c = 0; c <= 2; ++c) {
+                board[r][c] = ' ';
             }
         }
-
-        row = -1;
-        col = -1;
-        playgame(in, out);
     }
 
     public static void playgame(BufferedReader in, PrintWriter out) throws IOException {
         Scanner scannerInput = new Scanner(System.in);
-        boolean gameOver = false;
+        boolean playerTurn = false;
+        int row = -1;
+        int col = -1;
 
-        for(boolean computerTurn = false; !computerTurn; gameOver = !gameOver) {
-            if (!gameOver) {
+        for(boolean gameOver = false; !gameOver; playerTurn = !playerTurn) {
+            if (!playerTurn) {
                 String str = in.readLine();
                 if (!str.equals("NONE")) {
                     String[] data = str.split("\\s+");
@@ -51,36 +44,19 @@ public class InstructorClient {
                         }
 
                         String result = data[3];
-                        byte resultMessageOption = -1;
-                        switch(result.hashCode()) {
-                            case 83056:
-                                if (result.equals("TIE")) {
-                                    resultMessageOption = 1;
-                                }
-                                break;
-                            case 85948:
-                                if (result.equals("WIN")) {
-                                    resultMessageOption = 0;
-                                }
-                                break;
-                            case 2342691:
-                                if (result.equals("LOSS")) {
-                                    resultMessageOption = 2;
-                                }
-                        }
-
-                        switch(resultMessageOption) {
-                            case 0:
+                        switch(result) {
+                            case "WIN":
                                 System.out.println("\n\nCongratulations!!! You WON the game!");
                                 break;
-                            case 1:
+                            case "LOSS":
+                                System.out.println("\nSORRY! You LOST the game!");
+                                break;
+                            case "TIE":
                                 System.out.println("\nThe game was a TIE!");
                                 break;
-                            case 2:
-                                System.out.println("\nSORRY! You LOST the game!");
                         }
 
-                        computerTurn = true;
+                        gameOver = true;
                     } else {
                         row = Integer.parseInt(data[1]);
                         col = Integer.parseInt(data[2]);
